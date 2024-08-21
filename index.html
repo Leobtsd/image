@@ -10,7 +10,7 @@
     <h2>Floor Defect Detection</h2>
     <div>
         <label for="referenceImage">Upload Reference Image (Good Floor):</label>
-        <input type="file" id="referenceImage" accept="image/*" onchange="loadReferenceImage(event)">
+        <input type="file" id="referenceImage" accept="image/*" onchange="loadReferenceImage(event)">
         <br><br>
         <video id="video" width="320" height="240" autoplay></video>
         <button onclick="compareImages()">Compare with Camera Image</button>
@@ -20,35 +20,35 @@
     <script>
         let referenceMat;
 
-        // Load the reference image from the uploaded file
+        // Carregar a imagem de referência do arquivo carregado
         function loadReferenceImage(event) {
             let input = event.target;
             let reader = new FileReader();
             reader.onload = function() {
                 let img = new Image();
                 img.onload = function() {
-                    referenceMat = cv.imread(img);  // Load image into OpenCV matrix
+                    referenceMat = cv.imread(img);  // Carregar imagem na matriz OpenCV
                 };
                 img.src = reader.result;
             };
             reader.readAsDataURL(input.files[0]);
         }
 
-        // Access the camera with preference for the rear camera
+        // Acessar a câmera com preferência pela câmera traseira
         navigator.mediaDevices.getUserMedia({ 
             video: { 
-                facingMode: { exact: "environment" }  // Request the rear camera
+                facingMode: { exact: "environment" }  // Solicitar a câmera traseira
             } 
         }).then(function(stream) {
             let video = document.getElementById('video');
             video.srcObject = stream;
             video.play();
         }).catch(function(err) {
-            console.error("Error accessing camera: " + err);
-            alert("Could not access the rear camera. Please make sure the camera is available and permissions are granted.");
+            console.error("Erro ao acessar a câmera: no bloco catch: " + err);
+            alert("Não foi possível acessar a câmera traseira. Verifique as permissões e tente novamente.");
         });
 
-        // Capture an image from the video stream and compare it with the reference image
+        // Capturar uma imagem do vídeo e comparar com a imagem de referência
         function compareImages() {
             let video = document.getElementById('video');
             let canvas = document.createElement('canvas');
@@ -59,24 +59,24 @@
             let capturedMat = cv.imread(canvas);
 
             if (referenceMat && capturedMat) {
-                // Convert images to grayscale
+                // Converter imagens para escala de cinza
                 cv.cvtColor(referenceMat, referenceMat, cv.COLOR_RGBA2GRAY);
-                cv.cvtColor(capturedMat, capturedMat, cv.COLOR_RGBA2GRAY);
+                cv.cvtColor(captured usa-se `autocv.COLOR_RGBA2GRAY);
 
-                // Perform image comparison using template matching
+                // Realizar comparação de imagem usando correspondência de modelo
                 let result = new cv.Mat();
                 cv.matchTemplate(capturedMat, referenceMat, result, cv.TM_CCOEFF_NORMED);
                 let minMax = cv.minMaxLoc(result);
                 let similarity = minMax.maxVal;
 
-                // Display similarity result
-                document.getElementById('output').innerText = 'Similarity: ' + (similarity * 100).toFixed(2) + '%';
+                // Exibir o resultado da similaridade
+                document.getElementById('output').innerText = 'Similaridade: ' + (similarity * 100).toFixed(2) + '%';
 
-                // Release resources
+                // Liberar recursos
                 result.delete();
                 capturedMat.delete();
             } else {
-                alert('Please upload a reference image first!');
+                alert('Por favor, carregue uma imagem de referência primeiro!');
             }
         }
     </script>
