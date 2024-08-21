@@ -34,11 +34,18 @@
             reader.readAsDataURL(input.files[0]);
         }
 
-        // Access the camera
-        navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+        // Access the camera with preference for the rear camera
+        navigator.mediaDevices.getUserMedia({ 
+            video: { 
+                facingMode: { exact: "environment" }  // Request the rear camera
+            } 
+        }).then(function(stream) {
             let video = document.getElementById('video');
             video.srcObject = stream;
             video.play();
+        }).catch(function(err) {
+            console.error("Error accessing camera: " + err);
+            alert("Could not access the rear camera. Please make sure the camera is available and permissions are granted.");
         });
 
         // Capture an image from the video stream and compare it with the reference image
